@@ -1,22 +1,36 @@
 import { useEffect, useState } from 'react'
 
+async function generateHash (payload) {
+  const generatedHashAsArrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload))
+  const hashArray = new Uint8Array(generatedHashAsArrayBuffer)
+  const hashInHex = hashArray.reduce((a, b) => a + b.toString(16).padStart(2, '0'), '')
+
+  return hashInHex
+}
+
 export function useBlocks () {
   const [blocks, setBlocks] = useState([])
 
-  async function generateNewHash (block) {
-    const blockData = block.index +
-      block.previousHash + block.timestamp +
-      block.data + block.nonce
+  function checkIfHashIsValid (hash) {
+    return hash.startsWith('000')
+  }
 
-    const generatedHashAsArrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(blockData))
-
-    const hashArray = new Uint8Array(generatedHashAsArrayBuffer)
-    const hashInHex = hashArray.reduce((a, b) => a + b.toString(16).padStart(2, '0'), '')
-    return hashInHex
+  async function generateNewValidHash (block) {
+    let blockData
+    let hash
+    while (true) {
+      blockData = block.index +
+        block.previousHash + block.timestamp +
+        block.data + block.nonce
+      hash = await generateHash(blockData)
+      if (checkIfHashIsValid(hash)) return hash
+      block.nonce++
+      block.timestamp = Date.now()
+    }
   }
 
   async function generateNextBlock (data) {
-    const { hash: previousHash, index: previousIndex } = blocks[blocks.length - 1] || { hash: '0', index: -1 }
+    const { hash: previousHash, index: previousIndex } = blocks[blocks.length - 1] || { hash: '000', index: -1 }
 
     const newBlock = {
       data,
@@ -26,7 +40,7 @@ export function useBlocks () {
       nonce: 1
     }
 
-    newBlock.hash = await generateNewHash(newBlock)
+    newBlock.hash = await generateNewValidHash(newBlock)
     setBlocks(prevState => [...prevState, newBlock])
   }
 
@@ -34,6 +48,7 @@ export function useBlocks () {
 
   return {
     blocks,
-    generateNextBlock
+    generateNextBlock,
+    checkIfHashIsValid
   }
 }

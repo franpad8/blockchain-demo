@@ -16,6 +16,16 @@
   background-color: #303030;
 }
 
+.block--previousHash,
+.block--hash {
+  color: red
+}
+
+.block--previousHash.valid,
+.block--hash.valid {
+  color: green
+}
+
 .block--nonce {
   text-align: right;
   
