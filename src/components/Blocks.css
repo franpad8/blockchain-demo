@@ -1,0 +1,30 @@
+.blocks {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+  gap: 4rem;
+  list-style: none;
+  padding: 0;
+}
+
+.block {
+  border-radius: .9rem;
+  padding: 1rem;
+  width: 100%;
+  background-color: #303030;
+}
+
+.block--nonce {
+  text-align: right;
+  
+}
+
+.block--nonce > label {
+  background-color: #fafafa;
+  padding: .5rem;
+  border-radius: .2rem;
+  color: black;
+  font-weight: bold;
+}

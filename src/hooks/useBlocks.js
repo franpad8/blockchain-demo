@@ -3,6 +3,18 @@ import { useEffect, useState } from 'react'
 export function useBlocks () {
   const [blocks, setBlocks] = useState([])
 
+  async function generateNewHash (block) {
+    const blockData = block.index +
+      block.previousHash + block.timestamp +
+      block.data + block.nonce
+
+    const generatedHashAsArrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(blockData))
+
+    const hashArray = new Uint8Array(generatedHashAsArrayBuffer)
+    const hashInHex = hashArray.reduce((a, b) => a + b.toString(16).padStart(2, '0'), '')
+    return hashInHex
+  }
+
   const generateInitialBlock = async () => {
     const initialBlock = {
       data: 'Welcome to Blockchain Demo',
@@ -10,25 +22,31 @@ export function useBlocks () {
       previousHash: 0,
       index: 0,
       timestamp: Date.now(),
-      nonce: 0
+      nonce: 1
     }
 
-    const blockData = initialBlock.index +
-      initialBlock.previousHash + initialBlock.timestamp +
-      initialBlock.data + initialBlock.nonce
-
-    const generatedHashAsArrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(blockData))
-
-    const hashArray = new Uint8Array(generatedHashAsArrayBuffer)
-    const hashInHex = hashArray.reduce((a, b) => a + b.toString(16).padStart(2, '0'), '')
-
-    initialBlock.hash = hashInHex
+    initialBlock.hash = await generateNewHash(initialBlock)
     setBlocks([initialBlock])
+  }
+
+  async function generateNextBlock (data) {
+    const { hash: previousHash, index: previousIndex } = blocks[blocks.length - 1]
+    const newBlock = {
+      data,
+      previousHash,
+      hash: '0',
+      index: previousIndex + 1,
+      timestamp: Date.now(),
+      nonce: 1
+    }
+    newBlock.hash = await generateNewHash(newBlock)
+    setBlocks(prevState => [...prevState, newBlock])
   }
 
   useEffect(() => { generateInitialBlock() }, [])
 
   return {
-    blocks
+    blocks,
+    generateNextBlock
   }
 }
