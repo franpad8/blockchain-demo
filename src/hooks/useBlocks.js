@@ -15,35 +15,22 @@ export function useBlocks () {
     return hashInHex
   }
 
-  const generateInitialBlock = async () => {
-    const initialBlock = {
-      data: 'Welcome to Blockchain Demo',
-      hash: '0',
-      previousHash: 0,
-      index: 0,
-      timestamp: Date.now(),
-      nonce: 1
-    }
-
-    initialBlock.hash = await generateNewHash(initialBlock)
-    setBlocks([initialBlock])
-  }
-
   async function generateNextBlock (data) {
-    const { hash: previousHash, index: previousIndex } = blocks[blocks.length - 1]
+    const { hash: previousHash, index: previousIndex } = blocks[blocks.length - 1] || { hash: '0', index: -1 }
+
     const newBlock = {
       data,
       previousHash,
-      hash: '0',
       index: previousIndex + 1,
       timestamp: Date.now(),
       nonce: 1
     }
+
     newBlock.hash = await generateNewHash(newBlock)
     setBlocks(prevState => [...prevState, newBlock])
   }
 
-  useEffect(() => { generateInitialBlock() }, [])
+  useEffect(() => { generateNextBlock('Welcome to Blockchain Demo') }, [])
 
   return {
     blocks,
