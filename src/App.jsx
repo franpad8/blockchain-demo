@@ -4,7 +4,7 @@ import { useBlocks } from './hooks/useBlocks'
 import './App.css'
 
 function App () {
-  const { blocks, generateNextBlock, updateBlockChain } = useBlocks()
+  const { blocks, generateNextBlock, changeBlockData, mineBlock } = useBlocks()
   const inputId = useId()
 
   async function handleSubmit (event) {
@@ -19,7 +19,7 @@ function App () {
         <h1>BLOCKCHAIN DEMO</h1>
       </header>
       <main>
-        <Blocks blocks={blocks} updateBlockChain={updateBlockChain} />
+        <Blocks blocks={blocks} changeBlockData={changeBlockData} mineBlock={mineBlock} />
         <div className='block'>
           <form className='new-block-form' onSubmit={handleSubmit}>
             <div>

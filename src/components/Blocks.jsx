@@ -2,12 +2,12 @@
 import './Blocks.css'
 import { isValidHash, isValidBlock } from '../utils'
 
-function Block ({ index, hash, previousHash, data, timestamp, nonce, updateBlockChain }) {
+function Block ({ index, hash, previousHash, data, timestamp, nonce, changeBlockData, mineBlock }) {
   const hashClass = `block--hash${isValidHash(hash) ? ' valid' : ''}`
   const previousHashClass = `block--previousHash${isValidHash(previousHash) ? ' valid' : ''}`
 
   function handleInputChange (event) {
-    updateBlockChain({ newData: event.target.value, blockIndex: index })
+    changeBlockData({ newData: event.target.value, blockIndex: index })
   }
 
   return (
@@ -29,7 +29,7 @@ function Block ({ index, hash, previousHash, data, timestamp, nonce, updateBlock
         {
           isValidBlock(...arguments)
             ? <label>{nonce}</label>
-            : <button>Mine</button>
+            : <button className='mine-btn' onClick={() => mineBlock(index)}>Mine</button>
         }
       </div>
     </li>
@@ -37,12 +37,12 @@ function Block ({ index, hash, previousHash, data, timestamp, nonce, updateBlock
 }
 
 /* eslint-disable react/prop-types */
-export function Blocks ({ blocks, updateBlockChain }) {
+export function Blocks ({ blocks, changeBlockData, mineBlock }) {
   return (
     <ul className='blocks'>
       {
         blocks.map(block => (
-          <Block key={block.index} updateBlockChain={updateBlockChain} {...block} />
+          <Block key={block.index} changeBlockData={changeBlockData} mineBlock={mineBlock} {...block} />
         ))
       }
     </ul>
