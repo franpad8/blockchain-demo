@@ -4,13 +4,13 @@ import { useBlocks } from './hooks/useBlocks'
 import './App.css'
 
 function App () {
-  const { blocks, generateNextBlock } = useBlocks()
+  const { blocks, generateNextBlock, updateBlockChain } = useBlocks()
   const inputId = useId()
 
-  function handleSubmit (event) {
+  async function handleSubmit (event) {
     event.preventDefault()
     const newBlockData = (new FormData(event.target)).get('newBlockData')
-    generateNextBlock(newBlockData)
+    await generateNextBlock(newBlockData)
   }
 
   return (
@@ -19,7 +19,7 @@ function App () {
         <h1>BLOCKCHAIN DEMO</h1>
       </header>
       <main>
-        <Blocks blocks={blocks} />
+        <Blocks blocks={blocks} updateBlockChain={updateBlockChain} />
         <div className='block'>
           <form className='new-block-form' onSubmit={handleSubmit}>
             <div>

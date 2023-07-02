@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
+import { isValidHash } from '../utils'
 
-async function generateHash (payload) {
+async function generateHashFor (block) {
+  const payload = getPayloadFrom(block)
   const generatedHashAsArrayBuffer = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(payload))
   const hashArray = new Uint8Array(generatedHashAsArrayBuffer)
   const hashInHex = hashArray.reduce((a, b) => a + b.toString(16).padStart(2, '0'), '')
@@ -8,22 +10,20 @@ async function generateHash (payload) {
   return hashInHex
 }
 
+function getPayloadFrom (block) {
+  return block.index +
+    block.previousHash + block.timestamp +
+    block.data + block.nonce
+}
+
 export function useBlocks () {
   const [blocks, setBlocks] = useState([])
 
-  function checkIfHashIsValid (hash) {
-    return hash.startsWith('000')
-  }
-
   async function generateNewValidHash (block) {
-    let blockData
     let hash
     while (true) {
-      blockData = block.index +
-        block.previousHash + block.timestamp +
-        block.data + block.nonce
-      hash = await generateHash(blockData)
-      if (checkIfHashIsValid(hash)) return hash
+      hash = await generateHashFor(block)
+      if (isValidHash(hash)) return hash
       block.nonce++
       block.timestamp = Date.now()
     }
@@ -44,11 +44,28 @@ export function useBlocks () {
     setBlocks(prevState => [...prevState, newBlock])
   }
 
+  async function updateBlockChain ({ newData, blockIndex }) {
+    const newBlocks = [...blocks]
+    let blockToUpdate = newBlocks[blockIndex]
+    blockToUpdate.data = newData
+    blockToUpdate.hash = await generateHashFor(blockToUpdate)
+
+    // Update following blocks' hashes and previous hashes
+    for (let i = blockIndex + 1; i < blocks.length; i++) {
+      blockToUpdate = newBlocks[i]
+      blockToUpdate.previousHash = newBlocks[i - 1].hash
+      blockToUpdate.hash = await generateHashFor(blockToUpdate)
+    }
+
+    setBlocks(newBlocks)
+  }
+
   useEffect(() => { generateNextBlock('Welcome to Blockchain Demo') }, [])
 
   return {
     blocks,
     generateNextBlock,
-    checkIfHashIsValid
+    isValidHash,
+    updateBlockChain
   }
 }
