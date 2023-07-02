@@ -17,6 +17,10 @@
   background-color: #303030;
 }
 
+.block input {
+  width: 50%;
+}
+
 .block--previousHash,
 .block--hash {
   color: red

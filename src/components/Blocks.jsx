@@ -37,12 +37,12 @@ function Block ({ index, hash, previousHash, data, timestamp, nonce, changeBlock
 }
 
 /* eslint-disable react/prop-types */
-export function Blocks ({ blocks, changeBlockData, mineBlock }) {
+export function Blocks ({ blocks, changeBlockData, mineBlock, peer }) {
   return (
     <ul className='blocks'>
       {
         blocks.map(block => (
-          <Block key={block.index} changeBlockData={changeBlockData} mineBlock={mineBlock} {...block} />
+          <Block key={`${peer}-${block.index}`} changeBlockData={changeBlockData} mineBlock={mineBlock} {...block} />
         ))
       }
     </ul>

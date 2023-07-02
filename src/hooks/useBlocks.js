@@ -1,11 +1,17 @@
-import { useEffect, useState } from 'react'
-import { isValidHash, generateHashFor, updateBlocksFromIndex, generateNewValidHash } from '../utils'
+import { useState } from 'react'
+import {
+  isValidHash,
+  generateHashFor,
+  updateBlocksFromIndex,
+  generateNewValidHash,
+  getInitialBlock
+} from '../utils'
 
-export function useBlocks () {
-  const [blocks, setBlocks] = useState([])
+export function useBlocks (initialBlocks = [getInitialBlock()]) {
+  const [blocks, setBlocks] = useState(initialBlocks)
 
   async function generateNextBlock (data) {
-    const { hash: previousHash, index: previousIndex } = blocks[blocks.length - 1] || { hash: '000', index: -1 }
+    const { hash: previousHash, index: previousIndex } = blocks[blocks.length - 1]
 
     const newBlock = {
       data,
@@ -41,13 +47,12 @@ export function useBlocks () {
     setBlocks(newBlocks)
   }
 
-  useEffect(() => { generateNextBlock('Welcome to Blockchain Demo') }, [])
-
   return {
     blocks,
     generateNextBlock,
     isValidHash,
     changeBlockData,
-    mineBlock
+    mineBlock,
+    setBlocks
   }
 }

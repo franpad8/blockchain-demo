@@ -11,3 +11,29 @@ main {
   align-items: center;
   gap: 1rem;
 }
+
+.new-block-form input {
+  width: auto;
+}
+
+.peers {
+  display: flex;
+  list-style: none;
+  padding: 0;
+  justify-content: left;
+  align-items: center;
+  gap: 1rem;
+}
+
+.peer {
+  cursor: pointer;
+  padding: 1rem;
+  background-color: #1a1a1a;
+  border-radius: 0.5rem;
+  color: white;
+}
+
+.peer.active,
+.peer:hover {
+  border: 2px solid white;
+}

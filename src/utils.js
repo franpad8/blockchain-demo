@@ -1,3 +1,14 @@
+export function getInitialBlock () {
+  return {
+    data: 'Welcome to Blockchain Demo',
+    previousHash: '000',
+    hash: '0',
+    index: 0,
+    timestamp: Date.now(),
+    nonce: 1
+  }
+}
+
 export function isValidHash (hash) {
   return hash.startsWith('000')
 }
